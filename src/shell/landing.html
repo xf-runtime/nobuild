@@ -1,0 +1,196 @@
+<!-- Landing Page Scope -->
+<div class="d-flex flex-column h-100 w-100">
+
+    <!-- ========================================== -->
+    <!-- UNAUTHENTICATED STATE: Clean Sign-In Card  -->
+    <!-- ========================================== -->
+    <div v-if="!xa.jwt" class="container my-auto py-5 d-flex align-items-center justify-content-center flex-grow-1 min-vh-100">
+        <div class="row align-items-center justify-content-center w-100 mx-auto" style="max-width: 1040px;">
+            <!-- Left Column: Branding -->
+            <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0 pe-lg-4">
+                <div class="d-inline-flex align-items-center gap-2 mb-3">
+                    <img src="assets/favicon.ico" height="38" width="38" alt="xF" />
+                    <h1 class="h2 fw-bold text-dark mb-0">xF Runtime</h1>
+                </div>
+                <p class="text-secondary mb-4 fs-6" style="max-width: 420px;">
+                    Lightweight metadata-driven engine with zero compilation overhead.
+                </p>
+                <a href="#page/custompage" class="btn btn-outline-secondary rounded-2 px-3 py-1">
+                    <span>Architecture & Docs</span>
+                    <i class="ph ph-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <!-- Right Column: Login Card -->
+            <div class="col-lg-5">
+                <div class="card border rounded-3 shadow-sm bg-white" style="border-color: var(--xf-border-color) !important;">
+                    <div class="card-body p-4 p-sm-5">
+                        <div class="text-center mb-4">
+                            <i class="ph mb-2 fs-2 text-primary"
+                               v-bind:class="auth.mode == 2 ? 'ph-check-circle text-success' : (auth.mode == 1 ? 'ph-key' : 'ph-lock-key')">
+                            </i>
+                            <h2 class="h5 fw-bold text-dark mb-1">
+                                <span v-if="!auth.mode">Sign In</span>
+                                <span v-else-if="auth.mode == 1">Reset Password</span>
+                                <span v-else-if="auth.mode == 2">Success!</span>
+                            </h2>
+                            <p class="text-muted text-xs mb-0">
+                                <span v-if="!auth.mode">Enter credentials to access workspace</span>
+                                <span v-else-if="auth.mode == 1">Please choose a new password</span>
+                                <span v-else-if="auth.mode == 2">Password has been updated</span>
+                            </p>
+                        </div>
+
+                        <!-- STATE 0: Standard Sign In -->
+                        <form v-if="!auth.mode" @submit.prevent="submitLogin()">
+                            <div class="mb-3">
+                                <label for="usernameInput" class="form-label">Username</label>
+                                <input id="usernameInput" class="form-control" type="text" placeholder="Username" v-model="auth.user" autocomplete="username" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="passwordInput" class="form-label">Password</label>
+                                <input id="passwordInput" class="form-control" type="password" placeholder="Password" v-model="auth.pw" autocomplete="current-password" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2 rounded-2 fw-semibold">
+                                Sign In
+                            </button>
+                        </form>
+
+                        <!-- STATE 1: Password Reset -->
+                        <form v-if="auth.mode == 1" @submit.prevent="submitReset()">
+                            <div class="mb-3">
+                                <label for="newPw" class="form-label">New Password</label>
+                                <input id="newPw" class="form-control" type="password" placeholder="New Password" v-model="auth.p1" required>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="confirmPw" class="form-label">Confirm Password</label>
+                                <input id="confirmPw" class="form-control" type="password" placeholder="Re-enter Password" v-model="auth.p2" required>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2 rounded-2 fw-semibold" v-bind:disabled="!auth.p1 || auth.p1 !== auth.p2">
+                                Set Password
+                            </button>
+                        </form>
+
+                        <!-- STATE 2: Confirmation Screen -->
+                        <div v-if="auth.mode == 2">
+                            <div class="alert alert-success d-flex align-items-center mb-4 text-xs" role="alert">
+                                <i class="ph-bold ph-check-circle me-2 fs-5"></i>
+                                <div>Password changed. Proceed to sign in.</div>
+                            </div>
+                            <button type="button" class="btn btn-primary w-100 py-2 rounded-2 fw-semibold" @click="resetContinue()">
+                                Continue
+                            </button>
+                        </div>
+
+                        <!-- Error Banner -->
+                        <div v-if="auth.ex" class="alert alert-danger py-2 px-3 mt-3 text-xs d-flex align-items-center">
+                            <i class="ph-bold ph-warning-octagon me-2 fs-6"></i>
+                            <div>{{ auth.ex }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- AUTHENTICATED STATE: Shell Workspace Aside -->
+    <!-- ========================================== -->
+    <div v-else class="d-flex flex-grow-1 position-relative w-100 h-100 overflow-hidden">
+
+        <!-- Collapsible Aside Nav -->
+        <aside id="docAside" class="xf-aside border-end d-flex flex-column flex-shrink-0 h-100" style="border-color: var(--xf-border-color) !important;">
+            <div class="d-flex align-items-center justify-content-center p-2 border-bottom flex-shrink-0" style="height: 48px; border-color: var(--xf-border-color) !important;">
+                <button type="button" class="btn btn-icon btn-light border-0"
+                        onclick="const aside = document.getElementById('docAside'); const isExp = aside.classList.toggle('expanded'); const icon = this.querySelector('i'); icon.classList.toggle('ph-caret-right', !isExp); icon.classList.toggle('ph-caret-left', isExp);"
+                        title="Toggle Sidebar">
+                    <i class="ph-bold ph-caret-right text-secondary"></i>
+                </button>
+            </div>
+
+            <div class="p-2 flex-grow-1 overflow-y-auto overflow-x-hidden">
+                <ul class="nav flex-column gap-1">
+                    <li class="nav-item">
+                        <a href="#/uc_operator/1" class="nav-link" title="Operator 1">
+                            <i class="ph ph-user-gear nav-icon text-primary"></i>
+                            <span class="nav-text">Operator 1</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#/uc_operator/2" class="nav-link" title="Operator 2">
+                            <i class="ph ph-identification-badge nav-icon text-primary"></i>
+                            <span class="nav-text">Operator 2</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#/uc_vehicle/1" class="nav-link" title="Vehicle 1">
+                            <i class="ph ph-truck nav-icon text-primary"></i>
+                            <span class="nav-text">Vehicle 1</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" onclick="$init('uc_driver', 3)" class="nav-link" title="Driver 3">
+                            <i class="ph ph-steering-wheel nav-icon text-success"></i>
+                            <span class="nav-text">Driver 3</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" onclick="$init('uc_vehicle', 5)" class="nav-link" title="Vehicle 5">
+                            <i class="ph ph-bus nav-icon text-info"></i>
+                            <span class="nav-text">Vehicle 5</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" onclick="$search('uc_route', 'Route')" class="nav-link" title="Search Route">
+                            <i class="ph ph-compass nav-icon text-warning"></i>
+                            <span class="nav-text">Search Route</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="javascript:void(0)" onclick="$search('uc_vehicle', 'Veh')" class="nav-link" title="Search Vehicle">
+                            <i class="ph ph-magnifying-glass nav-icon text-secondary"></i>
+                            <span class="nav-text">Search Vehicle</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Target -->
+        <main class="flex-grow-1 p-4 overflow-auto h-100 bg-light">
+            <div class="w-100 mx-auto" style="max-width: 800px;">
+                <div class="mb-4">
+                    <h1 class="h4 fw-bold text-dark mb-1">
+                        Welcome back, <span class="text-primary">{{ xa.name }}</span>
+                    </h1>
+                    <p class="text-secondary text-xs">Zero-build client execution workspace.</p>
+                </div>
+
+                <div class="card border rounded-3 bg-white shadow-xs" style="border-color: var(--xf-border-color) !important;">
+                    <div class="card-body p-4 text-center">
+                        <div class="p-3 bg-light rounded-circle d-inline-flex mb-3">
+                            <i class="ph ph-stack fs-2 text-primary"></i>
+                        </div>
+                        <h2 class="h5 fw-bold mb-2">Sandbox & Quick Routing</h2>
+                        <p class="text-muted text-xs mb-4">Direct test triggers for reactive dynamic entity forms.</p>
+
+                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                            <a href="#/uc_operator/1" class="btn btn-sm btn-outline-secondary">Load 'uc_operator' 1</a>
+                            <a href="#/uc_operator/2" class="btn btn-sm btn-outline-secondary">Load 'uc_operator' 2</a>
+                            <a href="#/uc_vehicle/1" class="btn btn-sm btn-primary">Load Vehicle 1</a>
+                            <button class="btn btn-sm btn-success" onclick="$init('uc_driver', 3)">Load Driver 3</button>
+                            <button class="btn btn-sm btn-outline-primary" onclick="$init('uc_vehicle', 5)">Load Vehicle 5</button>
+                            <button class="btn btn-sm btn-warning" onclick="$search('uc_route', 'Route')">Search Route</button>
+                            <button class="btn btn-sm btn-outline-dark" onclick="$search('uc_vehicle', 'Veh')">Search Vehicle</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<div class="p-3 h-100 w-100 d-flex flex-column overflow-auto">
+    <!-- Action Toolbar -->
+    <div class="d-flex justify-content-between align-items-center pb-2 flex-shrink-0">
+        <div class="px-2">
+            <span class="fs-2 text-dark fw-bold">{{ xz.xf_entityhdr }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <!-- Refresh Action -->
+            <div class="btn btn-icon btn-sm btn-light btn-active-secondary" @click="refresh()" title="Refresh">
+                <i class="ph ph-arrows-clockwise"></i>
+            </div>
+
+            <!-- Save Action -->
+            <div v-if="xz.xf_id > 0" class="btn btn-icon btn-success px-2 py-0 rounded-pill" @click="xpost()" v-show="xz.xf_r<4" title="Save">
+                <i class="ph-bold ph-check fs-5"></i>
+            </div>
+
+            <!-- Create Action -->
+            <div v-if="xz.xf_id < 0" class="btn btn-icon btn-success btn-active-secondary" @click="xpost()" v-show="xz.xf_r<4" title="Create">
+                <i class="ph-bold ph-plus fs-5"></i>
+            </div>
+
+            <!-- Close Action (Routes back to home) -->
+            <div class="btn btn-icon btn-sm btn-light btn-active-danger" v-on:click="close('#page/landing')" title="Close">
+                <i class="ph-bold ph-x text-danger fs-5"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Injection Target -->
+    <div class="row flex-grow-1">
+        <!-- SECTIONS AND COMPONENTS INJECTED HERE -->
+    </div>
+</div>

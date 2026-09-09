@@ -1,0 +1,139 @@
+<!-- GLOBAL SHELL MOUNT POINT -->
+<div id="xf_app_shell" v-cloak class="d-flex flex-column vh-100 overflow-hidden">
+
+    <!-- AUTHENTICATED HEADER (Renders when logged in) -->
+    <div class="d-flex justify-content-between align-items-center p-2 bg-white border-bottom shadow-sm flex-shrink-0">
+        <a href="#page/landing" class="text-decoration-none">
+            <img src="assets/favicon.ico" height="32" />
+        </a>
+
+        <div class="d-flex align-items-center gap-3">
+            <!-- Command Palette Button -->
+            <a href="#" class="text-decoration-none btn btn-light btn-sm rounded-2 border border-light-subtle" @click.prevent="openSearch()" title="Command Palette">
+                <i class="ph ph-magnifying-glass text-primary"></i>
+            </a>
+            <!-- RECENT ENTITY HISTORY DOTS -->
+            <div class="d-flex align-items-center gap-1" v-if="history && history.length">
+                <i v-for="(item, idx) in history.slice(0, 8)"
+                   v-bind:key="item.entity + '_' + item.id"
+                   class="ph-fill ph-circle cursor-pointer"
+                   v-bind:class="idx === 0 ? 'text-primary' : 'text-secondary'"
+                   v-bind:style="{ fontSize: '11px',
+                   opacity: Math.max(0.25, 1 - (idx * 0.12)),
+                   cursor: 'pointer' }"
+                   v-bind:title="item.title + ' (#' + item.id + ')'"
+                   @click="openHistory(item)">
+                </i>
+            </div>
+            <span class="small fw-semibold text-secondary">{{ xa.name }}</span>
+            <a href="#logout" class="text-decoration-none small text-danger fw-medium">
+                <i class="ph ph-sign-out me-1"></i> Log Out
+            </a>
+        </div>
+    </div>
+
+    <!-- SHARED VIEW TARGET -->
+    <div id="xf_view_slot" class="flex-grow-1 p-0 container-fluid overflow-auto"></div>
+
+    <!-- COMMAND PALETTE / SEARCH MODAL -->
+    <div class="modal fade" tabindex="-1"
+         v-bind:class="showSearchModal ? 'show d-block' : ''"
+         v-bind:style="showSearchModal ? 'background-color: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px);' : ''"
+         v-bind:aria-hidden="!showSearchModal"
+         v-bind:inert="!showSearchModal"
+         @click.self="closeSearchModal()">
+
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content border-0 shadow-lg rounded-3 glass-modal">
+                <div class="modal-body p-4">
+
+                    <!-- Search Input Bar -->
+                    <div class="d-flex gap-2 mb-3 align-items-center rounded-2 shadow-sm px-2 py-1 bg-white">
+                        <button v-if="searchMode" class="btn btn-light rounded-2 shadow-sm border" @click="resetToEntitySearch()" title="Back">
+                            <i class="ph-bold ph-arrow-left"></i>
+                        </button>
+
+                        <div class="flex-grow-1 position-relative">
+                            <i class="ph ph-magnifying-glass position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                            <input type="text"
+                                   class="form-control form-control-lg bg-light border-0 ps-5 rounded-2 tech-font fs-6"
+                                   :placeholder="searchMode && selectedEntity ? 'Search ' + selectedEntity.hdr + '...' : 'Select Entity or Module...'"
+                                   v-model="searchQuery"
+                                   @input="onSearchInput()">
+                        </div>
+
+                        <button type="button" class="btn-close ms-2" @click="closeSearchModal()" aria-label="Close" title="Close Search"></button>
+                    </div>
+
+                    <!-- STAGE 1: Entities -->
+                    <div v-if="!searchMode" class="d-flex flex-wrap gap-2">
+                        <button type="button"
+                                v-for="entity in filteredEntities"
+                                :key="entity.id"
+                                class="btn btn-sm rounded-1 px-3 py-2 border tech-font"
+                                v-bind:class="entity.a ? 'btn-dark text-white' : 'btn-light text-dark'"
+                                @click="openEntity(entity)">
+                            {{ entity.hdr }}
+                        </button>
+                    </div>
+
+                    <!-- STAGE 2: Scrollable Results -->
+                    <div v-if="searchMode" class="search-results-container pe-2">
+                        <div v-if="isSearching" class="text-center py-4 text-muted small">
+                            <div class="spinner-border spinner-border-sm me-2"></div> Fetching data...
+                        </div>
+                        <div v-else-if="searchResults.length === 0" class="text-center py-4 text-muted small tech-font">
+                            No records found.
+                        </div>
+                        <div v-else class="table-responsive mh-600px">
+                            <table class="table table-condensed table-hover no-footer my-1">
+                                <thead class="bg-dark fw-bold">
+                                    <tr>
+                                        <th class="text-start text-muted text-uppercase cursor-pointer p-2" v-for="key in $objKeys(searchResults[0])">{{key}}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="A in searchResults" class="cursor-pointer" v-on:click="openRecord(A['xf_id']);">
+                                        <td class="p-2" v-for="key in $objKeys(A)">{{A[key]}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GLOBAL SPINNER -->
+<div id="xf_spinner" class="d-none position-fixed top-50 start-50 translate-middle" style="z-index: 9999;">
+    <div class="spinner-border text-dark" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+</div>
+
+<!-- GLOBAL ALERT NOTIFICATION -->
+<div class="toast-container position-fixed bottom-0 end-0 p-4" style="z-index: 9999;">
+
+    <!-- SUCCESS TOAST -->
+    <div id="xf_alert_success" class="toast align-items-center border-0 shadow text-bg-success rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex px-1 py-1">
+            <div class="toast-body d-flex align-items-center gap-3 fs-6 fw-medium w-100">
+                <i class="ph-bold ph-check-circle fs-4"></i>
+                <span class="xf_alert_msg_success"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-3 m-auto" onclick="_alertdismiss()" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <!-- ERROR TOAST -->
+    <div id="xf_alert_error" class="toast align-items-center border-0 shadow text-bg-danger rounded-3" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex px-1 py-1">
+            <div class="toast-body d-flex align-items-center gap-3 fs-6 fw-medium w-100">
+                <i class="ph-bold ph-warning-octagon fs-4"></i>
+                <span class="xf_alert_msg_error"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-3 m-auto" onclick="_alertdismiss()" aria-label="Close"></button>
+        </div>
+    </div>
+
+</div>
