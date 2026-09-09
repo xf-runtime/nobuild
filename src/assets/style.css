@@ -1,0 +1,208 @@
+﻿/* ==========================================================================
+   xF Runtime Enterprise Styling: Inter (10pt) + Lexend
+   ========================================================================== */
+
+:root {
+  --xf-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --xf-font-heading: 'Lexend', var(--xf-font-body);
+  --xf-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Typography Scale */
+  --xf-font-size-base: 13.33px; /* 10pt */
+  --xf-font-size-sm: 11.5px;
+  --xf-font-size-xs: 10px;
+
+  /* Enterprise Palette */
+  --xf-primary: #1d4ed8;
+  --xf-primary-hover: #1e40af;
+  --xf-primary-subtle: #eff6ff;
+  --xf-border-color: #e2e8f0;
+  --xf-surface: #ffffff;
+  --xf-surface-muted: #f8fafc;
+  --xf-text-main: #0f172a;
+  --xf-text-muted: #64748b;
+  --xf-danger: #dc2626;
+  --xf-success: #16a34a;
+
+  /* Elevations */
+  --xf-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --xf-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+  --xf-shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+  --xf-shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.03);
+}
+
+/* Global Reset */
+html, body {
+  height: 100%;
+  font-family: var(--xf-font-body) !important;
+  font-size: var(--xf-font-size-base) !important;
+  line-height: 1.45;
+  color: var(--xf-text-main);
+  background-color: var(--xf-surface-muted);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6,
+.display-1, .display-2, .display-3, .display-4, .display-5,
+.tech-font, .navbar-brand {
+  font-family: var(--xf-font-heading) !important;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  color: var(--xf-text-main);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--xf-font-mono) !important;
+}
+
+[v-cloak] {
+  display: none !important;
+}
+
+/* Form Controls & Inputs */
+.form-control, .form-select {
+  font-size: var(--xf-font-size-base) !important;
+  border: 1px solid var(--xf-border-color);
+  border-radius: 6px;
+  padding: 0.4rem 0.65rem;
+  color: var(--xf-text-main);
+  background-color: #ffffff;
+  box-shadow: var(--xf-shadow-xs);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--xf-primary);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+  outline: 0;
+}
+
+.form-label {
+  font-size: var(--xf-font-size-sm);
+  font-weight: 600;
+  color: var(--xf-text-muted);
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Enterprise Tables */
+.table {
+  font-size: var(--xf-font-size-base);
+  border-color: var(--xf-border-color);
+}
+
+.table > :not(caption) > * > * {
+  padding: 0.5rem 0.75rem;
+  border-bottom-color: var(--xf-border-color);
+}
+
+.table thead th {
+  font-family: var(--xf-font-heading);
+  font-size: var(--xf-font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--xf-text-muted);
+  background-color: #f1f5f9;
+  border-bottom: 1px solid var(--xf-border-color);
+}
+
+.table-hover > tbody > tr:hover > * {
+  background-color: #f8fafc;
+}
+
+/* Button Refinement */
+.btn {
+  font-size: var(--xf-font-size-base);
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-primary {
+  background-color: var(--xf-primary);
+  border-color: var(--xf-primary);
+}
+
+.btn-primary:hover, .btn-primary:focus {
+  background-color: var(--xf-primary-hover);
+  border-color: var(--xf-primary-hover);
+}
+
+.btn-icon {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border-radius: 6px;
+}
+
+/* Unified Grid Component Container */
+.component-container {
+  padding-bottom: 1rem;
+}
+
+/* Aside Navigation Bar */
+.xf-aside {
+  width: 50px;
+  transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #ffffff;
+}
+
+.xf-aside.expanded {
+  width: 240px;
+}
+
+.xf-aside .nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0.6rem;
+  color: var(--xf-text-main);
+  border-radius: 6px;
+  font-size: var(--xf-font-size-base);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.xf-aside .nav-link:hover {
+  background-color: var(--xf-surface-muted);
+  color: var(--xf-primary);
+}
+
+.xf-aside .nav-icon {
+  font-size: 1.15rem;
+  min-width: 24px;
+  text-align: center;
+}
+
+.xf-aside .nav-text {
+  display: none;
+  margin-left: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.xf-aside.expanded .nav-text {
+  display: inline;
+  opacity: 1;
+}
+
+/* Glass Modal */
+.glass-modal {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--xf-border-color) !important;
+  box-shadow: var(--xf-shadow-lg) !important;
+}
+
+/* Utility Helpers */
+.cursor-pointer { cursor: pointer; }
+.cursor-wait { cursor: wait !important; }
+.text-9pt { font-size: 12px; }
+.text-xs { font-size: var(--xf-font-size-xs); }
