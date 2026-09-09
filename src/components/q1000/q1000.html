@@ -1,1 +1,7 @@
 
+<div v-bind:class="xy.{{ATTR}}.c" class="component-container d-flex flex-column align-items-end">
+    <button class="btn btn-outline-dark py-2 text-9pt text-uppercase w-100"
+            v-bind:id="'post_{{ATTR}}'" @click="xpost('{{ATTR}}');">
+        {{xy.{{ATTR}}.h}}
+    </button>
+</div>
