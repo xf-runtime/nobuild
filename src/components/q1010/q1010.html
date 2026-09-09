@@ -1,1 +1,9 @@
 
+<div v-bind:class="xy.{{ATTR}}.c" class="component-container d-flex align-items-end">
+    <div class="w-100">
+        <label :for="'chk_{{ATTR}}'" class="form-label d-block">{{ xy.{{ATTR}}.h }}</label>
+        <div class="form-check form-switch pt-1">
+            <input class="form-check-input" type="checkbox" :id="'chk_{{ATTR}}'" v-model="xz.{{ATTR}}">
+        </div>
+    </div>
+</div>
